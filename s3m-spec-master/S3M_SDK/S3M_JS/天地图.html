@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xml:lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>cesium</title>
+	<script src="http://api.tianditu.gov.cn/api?v=4.0&tk=ca17d672cc66d91dfc701d51d732f11f" type="text/javascript"></script>
+	<script type="text/javascript" src="http://lbs.tianditu.gov.cn/api/js4.0/opensource/openlibrary/ImageOverlay.js"></script>
+	<style>
+		html, body{
+			margin: 0;
+		}
+	</style>
+</head>
+<body onLoad="onLoad()">
+	<div id="mapDiv" style="position:absolute;width:1920px; height:929px"></div>
+</body>
+<script type="text/javascript">
+    var map;
+    var zoom = 15;
+    var lay;
+    function onLoad() {
+        var imageURL = "http://t0.tianditu.gov.cn/img_w/wmts?" +
+            "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
+            "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=ca17d672cc66d91dfc701d51d732f11f";
+        //创建自定义图层对象
+        lay = new T.TileLayer(imageURL, {minZoom: 1, maxZoom: 18});
+        var config = {layers: [lay]};
+        //初始化地图对象
+        map = new T.Map("mapDiv", config);
+        //设置显示地图的中心点和级别
+        map.centerAndZoom(new T.LngLat(110.34, 39.01), zoom);
+        //允许鼠标滚轮缩放地图
+        map.enableScrollWheelZoom();
+        //坐标模拟数据
+        var dataInfo=[
+            {
+                msg:'这是定位一号',
+                x:110.348,
+                y:39.01
+            },
+            {
+                msg:'这是定位二号',
+                x:110.35,
+                y:39.012
+            },
+            {
+                msg:'这是定位三号',
+                x:110.36,
+                y:39.012
+            },
+        ]
+          //创建图片对象
+          var icon = new T.Icon({
+                iconUrl: "./图标.png",
+                iconSize: new T.Point(25, 35),//图标的大小
+                iconAnchor: new T.Point(30, 25)
+            });
+           for(var i=0;i<dataInfo.length;i++){
+                var marker = new T.Marker(new T.LngLat(dataInfo[i].x,dataInfo[i].y),{icon: icon});  // 创建标注图标
+                map.addOverLay(marker); // 将标注添加到地图中
+                var content =`<div style="margin-top:5px;font-size:1.1rem">${dataInfo[i].msg}</div>
+                    <div
+                        style="margin-top:15px;
+                        font-size:0.6rem;
+                        color:#409EFF;
+                        cursor: pointer;">
+                        <span>选择这里</span>
+                    </div>`;
+                addClickHandler(content,marker);
+
+            }
+            //开启信息框
+            function addClickHandler(content,marker){
+                marker.addEventListener("click",function(e){
+                    openInfo(content,e)}
+                );
+            }
+            //信息框函数
+            function openInfo(content,e){
+                var point = e.lnglat;
+                marker = new T.Marker(point);// 创建标注
+                var markerInfoWin = new T.InfoWindow(content,{offset:new T.Point(0,-30)}); // 创建信息窗口对象
+                map.openInfoWindow(markerInfoWin,point); //开启信息窗口
+            }
+
+        //画正方形
+        // var pointsZ=[]
+        // pointsZ.push(new T.LngLat(110.31, 39.013));
+        // pointsZ.push(new T.LngLat(110.35, 39.036));
+        // var bounds = new T.Rectangle(pointsZ,{
+        //     color: "red", weight: 3, opacity: 0.5, fillColor: "#FFFFFF", fillOpacity: 0.5
+        // });
+        // map.addOverLay(bounds);
+
+        //画多边形
+        var points = [];
+            points.push(new T.LngLat(110.316, 39.012));
+            points.push(new T.LngLat(110.317, 39.005));
+            points.push(new T.LngLat(110.348, 39.003));
+            points.push(new T.LngLat(110.349, 39.008));
+            // 创建面对象
+            var polygon = new T.Polygon(points,{
+                color: "blue", weight: 3, opacity: 0.5, fillColor: "#ac0", fillOpacity: 0.5
+            });
+            //向地图上添加面
+            map.addOverLay(polygon);
+            var bd = new T.LngLatBounds(
+                new T.LngLat(110.316, 39.012),
+                new T.LngLat(110.319, 39.0222));
+            var img = new T.ImageOverlay("./espaco.jpg", bd, {
+                opacity: 1,
+                alt: "月牙"
+            });
+            map.addOverLay(img);
+        //去掉左边的logo图标及相关版权信息
+        document.getElementsByClassName("tdt-control-copyright tdt-control")[0].style.display = 'none';
+    }
+</script>
+</html>

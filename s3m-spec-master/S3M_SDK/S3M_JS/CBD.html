@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>CBD</title>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.84/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.84/Build/Cesium/Cesium.js"></script>
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div id="cesiumContainer">
+</div>
+<script  type="module">
+    import S3MTilesLayer from './S3M_module/S3MTiles/S3MTilesLayer.js';
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmZTQzM2RhYy1mZDk0LTQxYjEtOThjOC03YzZmNDJkMWRiZDEiLCJpZCI6OTc4MjksImlhdCI6MTY1NTM3Mjc2Nn0.9JHtCNtdz93qO4L0LVeVMAsPrd0LFMEqaOuCxRavl0M';
+    let viewer = new Cesium.Viewer('cesiumContainer',{
+    });
+    viewer._cesiumWidget._innerCreditContainer.style.display = 'none'; // 去除logo信息
+    let scene = viewer.scene;
+    console.log(S3MTilesLayer)
+    let layer = new S3MTilesLayer({
+        context : scene._context,
+        url: './data/CBD/cbd.scp'
+    });
+
+	// // require(['./js/S3MTiles/S3MTilesLayer'], function(S3MTilesLayer) {
+  	//   let layer = new S3MTilesLayer({
+	//     context : scene._context,
+	//     url: './data/comModel/comModel.scp'  // 配置文件地址
+	// 	});
+    scene.primitives.add(layer);
+
+
+    // var fanUrl = 'http://support.supermap.com.cn:8090/webgl/examples/webgl/data/Fan.s3m';
+    // var pillarUrl = 'http://support.supermap.com.cn:8090/webgl/examples/webgl/data/Pillar.s3m';
+    // var keymap = {};
+    // keymap[fanUrl] = [];
+    // keymap[pillarUrl] = [];
+    // var layer = new Cesium.DynamicLayer3D(scene._context, [fanUrl, pillarUrl]);
+    // layer.updateInterval = 500;//动态图层更新时间
+    // layer.enableLocalOffset = false;//禁止模型局部偏移
+    // scene.primitives.add(layer);
+
+    layer.readyPromise.then(function() {
+        scene.camera.setView({
+            destination : new Cesium.Cartesian3(-2181968.890329965, 4385313.17843029, 4072712.8241634783),
+            orientation : {
+                heading : 3.1756648661534443,
+                pitch : -0.3715184468182904
+            }
+        });
+
+        // //   初始化场景位置
+        // viewer.scene.camera.flyTo({
+        //     // 初始化相机经纬度
+        //     destination: new Cesium.Cartesian3.fromDegrees(
+        //         121.54035,
+        //         38.92146,
+        //         2000
+        //     ),
+        //     orientation: {
+        //         heading: Cesium.Math.toRadians(0.0),
+        //         pitch: Cesium.Math.toRadians(-25.0), //从上往下看为-90
+        //         roll: 0,
+        //     },
+        // });
+    }).otherwise(function(error) {
+        console.log(error);
+    });
+	// })
+</script>
+</body>
+</html>
